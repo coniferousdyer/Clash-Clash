@@ -1,5 +1,6 @@
 import os
 import random
+from colorama import Fore
 from .building import TownHall, Hut, Wall, Cannon
 
 
@@ -45,19 +46,14 @@ class Village:
         ]
 
         # Create the grid (a 2D array making the job of representing the village easier)
-        self.grid = []
-        for i in range(self.size["height"]):
-            self.grid.append([])
-            for j in range(self.size["width"]):
-                self.grid[i].append(" ")
+        self.grid = [
+            [{"symbol": " ", "color": None}] * self.size["width"]
+            for _ in range(self.size["height"])
+        ]
 
         # Fill the grid with the buildings
         for building in self.buildings:
-            for i in range(building.size["height"]):
-                for j in range(building.size["width"]):
-                    self.grid[building.location["y"] + i][
-                        building.location["x"] + j
-                    ] = building.symbol
+            building.draw(self.grid)
 
     def check_position_availability(self, position, size):
         """
@@ -81,8 +77,8 @@ class Village:
             }
 
             # Check if the buildings are overlapping
-            if not (L["x"] >= bR["x"] or bL["x"] >= R["x"]) and not (
-                R["y"] >= bL["y"] or bR["y"] >= L["y"]
+            if not (L["x"] >= bR["x"] + 1 or bL["x"] >= R["x"] + 1) and not (
+                R["y"] >= bL["y"] + 1 or bR["y"] >= L["y"] + 1
             ):
                 return False
 
@@ -145,5 +141,10 @@ class Village:
         # difficult, with the issue of newlines and such.
         for i in range(self.size["height"]):
             for j in range(self.size["width"]):
-                print(self.grid[i][j], end="")
+                if self.grid[i][j]["symbol"] != " ":
+                    print(self.grid[i][j]["color"], end="")
+                    print(self.grid[i][j]["symbol"], end="")
+                    print(Fore.RESET, end="")
+                else:
+                    print(self.grid[i][j]["symbol"], end="")
             print()
