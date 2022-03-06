@@ -34,6 +34,9 @@ class TownHall(Building):
         # Call the parent class' constructor
         super().__init__(location, size, health)
 
+        # Set the building's symbol
+        self.symbol = "T"
+
 
 class Hut(Building):
     """
@@ -47,6 +50,9 @@ class Hut(Building):
 
         # Call the parent class' constructor
         super().__init__(location, size, health)
+
+        # Set the building's symbol
+        self.symbol = "H"
 
 
 class Wall(Building):
@@ -62,19 +68,25 @@ class Wall(Building):
         # Call the parent class' constructor
         super().__init__(location, size, health)
 
+        # Set the building's symbol
+        self.symbol = "W"
+
 
 class Cannon(Building):
     """
     The Cannon class handles the cannon details.
     """
 
-    def __init__(self, location, size={"width": 1, "height": 1}, health=40):
+    def __init__(self, location, size={"width": 2, "height": 2}, health=40):
         """
         Initialize the Cannon class.
         """
 
         # Call the parent class' constructor
         super().__init__(location, size, health)
+
+        # Set the building's symbol
+        self.symbol = "C"
 
         # Cannon-specific details
         self.damage = 10

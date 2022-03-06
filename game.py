@@ -32,4 +32,4 @@ class Game():
             self.village.draw()
 
             # Sleep for a bit
-            sleep(0.1)
+            sleep(0.2)
