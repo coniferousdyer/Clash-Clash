@@ -75,7 +75,7 @@ class Hut(Building):
         super().__init__(location, size, health)
 
         # Set the building's ASCII art and color
-        self.color = Fore.BLUE
+        self.color = Fore.CYAN
         self.art = [
             "|| ",
             "/-\\",

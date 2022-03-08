@@ -1,6 +1,6 @@
 from signal import signal
 import signal
-from menu import print_menu
+from utils.menu import print_menu
 from utils.cursor import Cursor
 from utils.input import Input
 from game import Game
@@ -24,7 +24,7 @@ def main():
     print_menu(input_)
 
     # Start the game
-    game = Game()
+    game = Game(input_)
 
 if __name__ == '__main__':
     main()
