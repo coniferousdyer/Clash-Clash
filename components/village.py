@@ -1,5 +1,4 @@
 import os
-from colorama import Fore
 from .building import TownHall, Hut, Wall, Cannon
 
 
@@ -39,9 +38,9 @@ class Village:
 
         # Predefined spawn locations for troops
         self.spawning_points = [
-            {"x": 0, "y": 0},
-            {"x": 0, "y": self.size["height"] - 1},
-            {"x": self.size["width"] - 1, "y": 0},
+            {"x": 0, "y": 1},
+            {"x": 0, "y": self.size["height"] - 2},
+            {"x": self.size["width"] - 2, "y": 0},
         ]
 
     def generate_walls(self):
@@ -53,7 +52,7 @@ class Village:
 
         # Generating top and bottom walls
         for i in range(
-            town_hall_location["x"] - 2,
+            town_hall_location["x"] - 1,
             town_hall_location["x"] + self.buildings[0].size["width"] + 1,
         ):
             self.buildings.append(Wall({"x": i, "y": town_hall_location["y"] - 1}))
@@ -61,9 +60,7 @@ class Village:
                 Wall(
                     {
                         "x": i,
-                        "y": town_hall_location["y"]
-                        + self.buildings[0].size["height"]
-                        + 1,
+                        "y": town_hall_location["y"] + self.buildings[0].size["height"],
                     }
                 )
             )
@@ -71,15 +68,13 @@ class Village:
         # Generating left and right walls
         for i in range(
             town_hall_location["y"] - 1,
-            town_hall_location["y"] + self.buildings[0].size["height"] + 2,
+            town_hall_location["y"] + self.buildings[0].size["height"] + 1,
         ):
-            self.buildings.append(Wall({"x": town_hall_location["x"] - 2, "y": i}))
+            self.buildings.append(Wall({"x": town_hall_location["x"] - 1, "y": i}))
             self.buildings.append(
                 Wall(
                     {
-                        "x": town_hall_location["x"]
-                        + self.buildings[0].size["width"]
-                        + 1,
+                        "x": town_hall_location["x"] + self.buildings[0].size["width"],
                         "y": i,
                     }
                 )
