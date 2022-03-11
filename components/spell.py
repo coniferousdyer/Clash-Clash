@@ -1,3 +1,6 @@
+from colorama import Fore
+
+
 class Rage:
     """
     The Rage spell.
@@ -46,5 +49,14 @@ class Heal:
 
             if troop.health * 1.5 <= troop.max_health:
                 troop.health *= 1.5
+                
+                # If less than 50% health left
+                if self.health <= self.max_health / 2:
+                    self.hit_color = Fore.YELLOW
+
+                # If less than 20% health left
+                if self.health <= self.max_health / 5:
+                    self.hit_color = Fore.RED
             else:
                 troop.health = troop.max_health
+                troop.hit_color = Fore.GREEN

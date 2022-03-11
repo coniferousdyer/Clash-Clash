@@ -223,23 +223,7 @@ class Cannon(Building):
             ):
                 self.target.take_damage(self.damage)
                 self.attack_time_left = self.ATTACK_INTERVAL
-        else:
-            self.attack_time_left -= 1
-
-    def draw(self, grid):
-        """
-        Draw the building.
-        """
-
-        # Check if the building is destroyed
-        if self.is_destroyed:
-            return
-
-            if distance_1 <= self.range or distance_2 <= self.range:
-                self.target.take_damage(self.damage)
                 if self.target.is_dead:
                     self.target = None
-
-            self.attack_time_left = self.ATTACK_INTERVAL
         else:
             self.attack_time_left -= 1

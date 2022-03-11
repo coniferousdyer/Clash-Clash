@@ -1,8 +1,9 @@
 from time import sleep
 import os
 from colorama import Fore
+from utils.art import get_win_art, get_game_over_art
 from components.village import Village
-from components.building import Cannon
+from components.building import Cannon, Wall
 from components.troop import King, Barbarian
 from components.spell import Heal, Rage
 
@@ -60,7 +61,7 @@ class Game:
 
     def draw_king_healthbar(self):
         """
-        Draw the king's healthbar into the grid
+        Draw the king's healthbar into the grid.
         """
 
         j = 0
@@ -68,8 +69,36 @@ class Game:
             self.grid[0][j] = {"symbol": char, "color": Fore.WHITE}
             j += 1
 
-        for i in range(len("Health:"), self.king.health + len("Health:")):
+        for i in range(len("Health:"), int(self.king.health) + len("Health:")):
             self.grid[0][i] = {"symbol": "█", "color": self.king.hit_color}
+
+    def check_end_condition(self):
+        """
+        Check if the game has ended, returning "win", "lose" or "continue".
+        """
+
+        win, lose = True, True
+
+        for barbarian in self.barbarians:
+            if not barbarian.is_dead:
+                lose = False
+                break
+
+        if lose and not self.king.is_dead:
+            lose = False
+
+        if lose:
+            return "lose"
+
+        for building in self.village.buildings:
+            if not isinstance(building, Wall) and not building.is_destroyed:
+                win = False
+                break
+
+        if win:
+            return "win"
+
+        return "continue"
 
     def start_game_loop(self, input_):
         """
@@ -78,6 +107,39 @@ class Game:
 
         # Run the game loop
         while True:
+            # -----------CHECK GAME END CONDITION-----------#
+
+            # Check if the game has ended
+            end_condition = self.check_end_condition()
+            if end_condition == "win":
+                # Clear the screen
+                os.system("clear")
+
+                # Print the art
+                print("\n" * (os.get_terminal_size().lines // 4))
+                print(Fore.GREEN)
+                for art_line in get_win_art():
+                    print(art_line.center(os.get_terminal_size().columns))
+
+                # Reset the color
+                print(Fore.RESET)
+                print("\n" * (os.get_terminal_size().lines // 2))
+                break
+            elif end_condition == "lose":
+                # Clear the screen
+                os.system("clear")
+
+                # Print the art
+                print("\n" * (os.get_terminal_size().lines // 4))
+                print(Fore.RED)
+                for art_line in get_game_over_art():
+                    print(art_line.center(os.get_terminal_size().columns))
+
+                # Reset the color
+                print(Fore.RESET)
+                print("\n" * (os.get_terminal_size().lines // 2))
+                break
+
             # -----------UPDATE GAME STATE-----------#
 
             # Clear screen and grid
@@ -99,7 +161,7 @@ class Game:
 
             # For each cannon, set targets if they are not set, and shoot
             for building in self.village.buildings:
-                if isinstance(building, Cannon):
+                if isinstance(building, Cannon) and not building.is_destroyed:
                     if building.target is None:
                         building.find_target([self.king] + self.barbarians)
                     building.shoot()
@@ -107,10 +169,11 @@ class Game:
             # Draw barbarians, set targets if they are not set, move them and attack
             for barbarian in self.barbarians:
                 barbarian.draw(self.grid)
-                if barbarian.target is None:
-                    barbarian.find_target(self.village.buildings)
-                barbarian.move(self.grid, self.village.buildings)
-                barbarian.attack()
+                if not barbarian.is_dead:
+                    if barbarian.target is None:
+                        barbarian.find_target(self.village.buildings)
+                    barbarian.move(self.grid, self.village.buildings)
+                    barbarian.attack(self.grid, self.village.buildings)
 
             # Print the grid
             self.print_grid()

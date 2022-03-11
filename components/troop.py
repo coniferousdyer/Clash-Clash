@@ -16,6 +16,7 @@ class Troop:
         # We use a copy of the location to prevent the original location from being modified.
         # We only do this here because a spawning point is provided as a location to the troop.
         self.location = copy.copy(location)
+        self.previous_location = copy.copy(location)
         self.size = size
         self.health = health
         self.max_health = health
@@ -30,9 +31,6 @@ class Troop:
         """
         Draw the troop.
         """
-
-        if self.is_dead:
-            return
 
         # Find the correct display color according to whether the troop was hit
         color = self.color
@@ -77,6 +75,9 @@ class Troop:
             ):
                 # Check if the position is occupied by a building. If not, the troop can move there.
                 for building in buildings:
+                    if building.is_destroyed:
+                        continue
+
                     if (
                         self.location["y"] + self.size["height"] + self.speed
                         >= building.location["y"]
@@ -114,6 +115,9 @@ class Troop:
             ):
                 # Check if the position is occupied by a building. If not, the troop can move there.
                 for building in buildings:
+                    if building.is_destroyed:
+                        continue
+
                     if (
                         self.location["y"] - self.speed >= building.location["y"]
                         and self.location["y"] - self.speed
@@ -150,6 +154,9 @@ class Troop:
             ):
                 # Check if the position is occupied by a building. If not, the troop can move there.
                 for building in buildings:
+                    if building.is_destroyed:
+                        continue
+
                     if (
                         self.location["y"] + i >= building.location["y"]
                         and self.location["y"] + i
@@ -191,6 +198,9 @@ class Troop:
             ):
                 # Check if the position is occupied by a building. If not, the troop can move there.
                 for building in buildings:
+                    if building.is_destroyed:
+                        continue
+
                     if (
                         self.location["y"] + i >= building.location["y"]
                         and self.location["y"] + i
@@ -286,6 +296,9 @@ class King(Troop):
 
         # Find the building in that location
         for building in buildings:
+            if building.is_destroyed:
+                continue
+
             if (
                 attack_location["y"] >= building.location["y"]
                 and attack_location["y"]
@@ -359,6 +372,8 @@ class Barbarian(Troop):
         if self.target is None:
             return
 
+        self.previous_location = copy.copy(self.location)
+
         # If the target is set, move towards it
         if self.target.location["y"] > self.location["y"]:
             self.move_down(grid, buildings)
@@ -369,7 +384,7 @@ class Barbarian(Troop):
         if self.target.location["x"] < self.location["x"]:
             self.move_left(grid, buildings)
 
-    def attack(self):
+    def attack(self, grid, buildings):
         """
         Attack the Barbarian's chosen target.
         """
@@ -378,32 +393,88 @@ class Barbarian(Troop):
         if self.target is None:
             return
 
-        distance_1 = abs(self.location["x"] - self.target.location["x"]) + abs(
+        # If the target is set and is near the barbarian, attack it
+        distance = abs(self.location["x"] - self.target.location["x"]) + abs(
             self.location["y"] - self.target.location["y"]
         )
-        distance_2 = abs(
-            self.location["x"] - (self.target.location["x"] + self.target.size["width"])
-        ) + abs(self.location["y"] - self.target.location["y"])
-        distance_3 = abs(self.location["x"] - self.target.location["x"]) + abs(
-            self.location["y"]
-            - (self.target.location["y"] + self.target.size["height"])
-        )
-        distance_4 = abs(
-            self.location["x"]
-            - (self.target.location["x"] + self.target.size["width"])
-            + abs(
-                self.location["y"]
-                - (self.target.location["y"] + self.target.size["height"])
-            )
-        )
-
-        # If the target is set and is near the barbarian, attack it
-        if (
-            distance_1 <= self.speed
-            or distance_2 <= self.speed
-            or distance_3 <= self.speed
-            or distance_4 <= self.speed
-        ):
+        if distance <= self.speed:
             self.target.take_damage(self.damage)
             if self.target.is_destroyed:
                 self.target = None
+        # If the barbarian cannot move because it is blocked by a building, and is out
+        # of range of its target, destroy the squares in between the barbarian and the
+        # target.
+        elif (
+            self.previous_location["y"] == self.location["y"]
+            and self.previous_location["x"] == self.location["x"]
+        ):
+            for direction in ["up", "down", "left", "right"]:
+                attack_location = {
+                    "x": self.location["x"],
+                    "y": self.location["y"],
+                }
+
+                if direction == "right":
+                    attack_location["x"] += self.size["width"]
+                    for i in range(self.size["height"]):
+                        if (
+                            grid[attack_location["y"] + i][attack_location["x"]][
+                                "symbol"
+                            ]
+                            != " "
+                        ):
+                            attack_location["y"] += i
+                            break
+
+                elif direction == "left":
+                    attack_location["x"] -= self.speed
+                    for i in range(self.size["height"]):
+                        if (
+                            grid[attack_location["y"] + i][attack_location["x"]][
+                                "symbol"
+                            ]
+                            != " "
+                        ):
+                            attack_location["y"] += i
+                            break
+
+                elif direction == "up":
+                    attack_location["y"] -= self.speed
+                    for i in range(self.size["width"]):
+                        if (
+                            grid[attack_location["y"]][attack_location["x"] + i][
+                                "symbol"
+                            ]
+                            != " "
+                        ):
+                            attack_location["x"] += i
+                            break
+
+                elif direction == "down":
+                    attack_location["y"] += self.size["height"]
+                    for i in range(self.size["width"]):
+                        if (
+                            grid[attack_location["y"]][attack_location["x"] + i][
+                                "symbol"
+                            ]
+                            != " "
+                        ):
+                            attack_location["x"] += i
+                            break
+
+                for building in buildings:
+                    if building.is_destroyed:
+                        continue
+
+                    if (
+                        attack_location["y"] >= building.location["y"]
+                        and attack_location["y"]
+                        <= building.location["y"] + building.size["height"]
+                    ):
+                        if (
+                            attack_location["x"] >= building.location["x"]
+                            and attack_location["x"]
+                            <= building.location["x"] + building.size["width"]
+                        ):
+                            building.take_damage(self.damage)
+                            break
