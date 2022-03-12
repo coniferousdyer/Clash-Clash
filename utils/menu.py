@@ -4,7 +4,7 @@ from utils.art import get_homescreen_art
 import os
 
 
-def print_menu(input_):
+def print_menu(proc, input_):
     """
     Prints the opening game menu.
     """
@@ -43,6 +43,8 @@ def print_menu(input_):
 
             # Check for the quit key
             if key == "q":
+                # Kill the background music
+                proc.terminate()
                 os.system("clear")
                 exit()
             

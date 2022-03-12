@@ -1,5 +1,5 @@
-from signal import signal
 import signal
+import subprocess
 from utils.menu import print_menu
 from utils.cursor import Cursor
 from utils.input import Input
@@ -20,11 +20,14 @@ def main():
     # Initialize the cursor class
     cursor = Cursor()
 
+    # Play background music
+    proc = subprocess.Popen(["mpg123", "--loop", "10", "./assets/music.mp3"])
+
     # Print the menu
-    print_menu(input_)
+    print_menu(proc, input_)
 
     # Start the game
-    game = Game(input_)
+    game = Game(proc, input_)
 
 if __name__ == '__main__':
     main()

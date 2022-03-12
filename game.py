@@ -13,7 +13,7 @@ class Game:
     The Game class sets up the game.
     """
 
-    def __init__(self, input_):
+    def __init__(self, proc, input_):
         """
         Initialize the Game class.
         """
@@ -33,7 +33,7 @@ class Game:
         self.spells = []
 
         # Start the game loop, running the game
-        self.start_game_loop(input_)
+        self.start_game_loop(proc, input_)
 
     def clear_grid(self):
         """
@@ -100,7 +100,7 @@ class Game:
 
         return "continue"
 
-    def start_game_loop(self, input_):
+    def start_game_loop(self, proc, input_):
         """
         Starts the game loop.
         """
@@ -112,6 +112,9 @@ class Game:
             # Check if the game has ended
             end_condition = self.check_end_condition()
             if end_condition == "win":
+                # Kill the background music
+                proc.terminate()
+
                 # Clear the screen
                 os.system("clear")
 
@@ -126,6 +129,9 @@ class Game:
                 print("\n" * (os.get_terminal_size().lines // 2))
                 break
             elif end_condition == "lose":
+                # Kill the background music
+                proc.terminate()
+
                 # Clear the screen
                 os.system("clear")
 
@@ -187,6 +193,8 @@ class Game:
 
                 # Quit the game
                 if key == "q":
+                    # Kill the background music
+                    proc.terminate()
                     os.system("clear")
                     exit()
 
