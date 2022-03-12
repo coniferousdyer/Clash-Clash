@@ -21,6 +21,7 @@ class Troop:
         self.health = health
         self.max_health = health
         self.damage = damage
+        self.leviathan_range = 10
         self.speed = speed
         self.direction = "right"
         self.was_hit = False
@@ -308,6 +309,32 @@ class King(Troop):
                     attack_location["x"] >= building.location["x"]
                     and attack_location["x"]
                     <= building.location["x"] + building.size["width"]
+                ):
+                    building.take_damage(self.damage)
+
+    def leviathan_attack(self, buildings):
+        """
+        Perform a splash attack on an area of 5x5 around the king.
+        """
+
+        for building in buildings:
+            if building.is_destroyed:
+                continue
+
+            # Check if any part of the building is in the splash area
+            if (
+                self.location["y"] >= building.location["y"] - self.leviathan_range
+                and self.location["y"]
+                <= building.location["y"]
+                + building.size["height"]
+                + self.leviathan_range
+            ):
+                if (
+                    self.location["x"] >= building.location["x"] - self.leviathan_range
+                    and self.location["x"]
+                    <= building.location["x"]
+                    + building.size["width"]
+                    + self.leviathan_range
                 ):
                     building.take_damage(self.damage)
 

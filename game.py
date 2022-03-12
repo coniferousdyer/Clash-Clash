@@ -210,6 +210,10 @@ class Game:
                 if key == " ":
                     self.king.attack(self.grid, self.village.buildings)
 
+                # Perform Leviathan axe attack
+                if key == "l":
+                    self.king.leviathan_attack(self.village.buildings)
+
                 # Spawn a barbarian at a spawning point
                 if key in ["1", "2", "3"]:
                     self.barbarians.append(
