@@ -238,31 +238,6 @@ class Troop:
         if self.health <= self.max_health / 5:
             self.hit_color = Fore.RED
 
-
-class King(Troop):
-    """
-    The King class.
-    """
-
-    def __init__(
-        self, location, size={"width": 3, "height": 4}, health=100, damage=5, speed=1
-    ):
-        """
-        Initialize the King class.
-        """
-
-        # Call the parent class' constructor
-        super().__init__(location, size, health, damage, speed)
-
-        # Set the King's ASCII art and color
-        self.color = Fore.MAGENTA
-        self.art = [
-            " M ",
-            " O ",
-            "/|\\",
-            "/ \\",
-        ]
-
     def attack(self, grid, buildings):
         """
         Attack the building depending on the direction of the king.
@@ -312,9 +287,34 @@ class King(Troop):
                 ):
                     building.take_damage(self.damage)
 
+
+class King(Troop):
+    """
+    The King class.
+    """
+
+    def __init__(
+        self, location, size={"width": 3, "height": 4}, health=100, damage=5, speed=1
+    ):
+        """
+        Initialize the King class.
+        """
+
+        # Call the parent class' constructor
+        super().__init__(location, size, health, damage, speed)
+
+        # Set the King's ASCII art and color
+        self.color = Fore.MAGENTA
+        self.art = [
+            " M ",
+            " O ",
+            "/|\\",
+            "/ \\",
+        ]
+
     def leviathan_attack(self, buildings):
         """
-        Perform a splash attack on an area of 5x5 around the king.
+        Perform a splash attack on an area of 10x10 around the king.
         """
 
         for building in buildings:
@@ -428,6 +428,7 @@ class Barbarian(Troop):
             self.target.take_damage(self.damage)
             if self.target.is_destroyed:
                 self.target = None
+
         # If the barbarian cannot move because it is blocked by a building, and is out
         # of range of its target, destroy the squares in between the barbarian and the
         # target.

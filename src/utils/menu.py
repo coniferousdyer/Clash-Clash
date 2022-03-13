@@ -1,6 +1,6 @@
 from time import sleep
 from colorama import Fore
-from utils.art import get_homescreen_art
+from .art import get_homescreen_art
 import os
 
 
@@ -31,7 +31,7 @@ def print_menu(proc, input_):
 
         # Print instructions to start
         print("\n"*3)
-        print("Press S to start, Q to exit and R to view replays.".center(os.get_terminal_size().columns))
+        print("Press S to start and Q to exit.".center(os.get_terminal_size().columns))
 
         # Increment the color loop iterator
         i = (i + 1) % len(color_loop)
